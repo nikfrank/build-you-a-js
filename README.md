@@ -12,7 +12,7 @@ here I'll use curried functions instead of prototype lexical scoping
 ```js
 const forEach = array=> callback => {
   for(let i=0; i<array.length; i++)
-  callbackmapping(array[i], i, array);
+  callback(array[i], i, array);
 };
 
 forEach([1, 2, 3], n => console.log(n));
