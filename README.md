@@ -1,68 +1,135 @@
+# build you a js, write everything from js in order to understand it
+
+to master each of the features we use in js, we will implement their API from primitives
+
+then you'll understand how to use them better!
+
+
+### .forEach
+
+here I'll use curried functions instead of prototype lexical scoping
+
+```js
+const forEach = array=> callback => {
+  for(let i=0; i<array.length; i++)
+  callbackmapping(array[i], i, array);
+};
+
+forEach([1, 2, 3], n => console.log(n));
+// log: 1, log: 2, log: 3
+```
+
+
+
+
+### .map
+
+here I'll use curried functions instead of prototype lexical scoping
+
+```js
+const map = array=> mapping => {
+  let result = [];
+  for(let i=0; i<array.length; i++)
+    result.push( mapping(array[i], i, array) );
+    
+  return result;
+};
+
+map([1, 4, 9])( x => x ** 1.5 ); // [1, 8, 27]
+```
+
+
+
+
+### .filter
+
+here I'll use curried functions instead of prototype lexical scoping
+
+```js
+const filter = array=> predicate => {
+  let result = [];
+  for(let i=0; i<array.length; i++)
+    predicate(array[i], i, array) && result.push(array[i]);
+    
+  return result;
+};
+
+filter([1, 2, 3, 4, 8])( x => !~(''+Math.log2(x)).indexOf('.') )
+// [1, 2, 4, 8]
+```
+
+
+### .reduce
+
+here I'll use curried functions instead of prototype lexical scoping
+
+```js
+const reduce = array=> (reducer, accumulator) => {
+  
+  for(let i=0; i<array.length; i++)
+    accumulator = reducer( accumulator, array[i], i, array );
+    
+  return accumulator;
+};
+
+reduce([1, 4, 9])( (a, x) => a + x ** 1.5, 0 ); // 36
+```
+
+
+
+### Promisify
+
+```js
+const promisify = apiWithNodeCallback => (...args)=>
+  (new Promise((resolve, reject)=>
+
+    apiWithNodeCallback( ...args.slice(0, -1), (err, res)=>
+      err ? reject(err) : resolve(res)
+    )
+
+  ));
+```
+
+
+
+### Promise
+
+```js
+const Promise = thunk=> {
+  let callbacks;
+
+  const p = {
+    then: callback => (callbacks.push({ then: callback }), p),
+    catch: callback => (callbacks.push({ catch: callback }), p),
+  };
+  
+  const runCbs = next => v => {
+    for(let i=0; i<callbacks.length; i++){
+      if( next in callbacks[i] ){
+        try {
+          v = callbacks[i][state](v);
+          next = 'then';
+          
+          // if v is a promise, runCbs on its callbacks
+          
+        } catch(e) {
+          v = e;
+          next = 'catch';
+        }
+      }
+    }
+    
+    if( next === 'catch' ){
+      console.error( v );
+      throw 'Exception Unhandled in Promise';
+    }
+  };
+  
+  thunk(runCbs('then'), runCbs('catch'));
+}
+```
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
